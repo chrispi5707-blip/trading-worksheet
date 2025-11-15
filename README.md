@@ -1,2 +1,0 @@
-# trading-worksheet
-Trading worksheet
