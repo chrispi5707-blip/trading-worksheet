@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10 EMA Momentum Trading Worksheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.4em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header .number {
+            background: white;
+            color: #667eea;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .section-content {
+            padding: 20px;
+        }
+
+        .subsection {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .subsection-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .icon {
+            margin-right: 10px;
+            font-size: 1.3em;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .checklist li:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checklist li.checked {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .calculator h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin: 15px 0;
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .input-group input {
+            padding: 10px;
+            border: 2px solid #dfe6e9;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .result {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .quality-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .quality-score-5 {
+            background: #4caf50;
+            color: white;
+        }
+
+        .quality-score-4 {
+            background: #ff9800;
+            color: white;
+        }
+
+        .quality-skip {
+            background: #f44336;
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .calc-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .calc-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .time-slot {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .time-best {
+            background: #4caf50;
+            color: white;
+        }
+
+        .time-good {
+            background: #2196f3;
+            color: white;
+        }
+
+        .time-caution {
+            background: #ff9800;
+            color: white;
+        }
+
+        .time-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .footer {
+            background: #2d3436;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 10 EMA Momentum Trading Worksheet</h1>
+            <p>Complete Trading Rules & Real-Time Calculator</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value">62%</div>
+                <div class="stat-label">Overall Win Rate</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">82.4%</div>
+                <div class="stat-label">Sweet Spot Win Rate</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">$1,618</div>
+                <div class="stat-label">Avg Daily Profit</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0.55-0.70%</div>
+                <div class="stat-label">Optimal Stop %</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Section 1: Time of Day -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">1</span>
+                    TIME OF DAY (CST)
+                </div>
+                <div class="section-content">
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">⭐</span>
+                            Golden Hour (BEST)
+                        </div>
+                        <div class="time-slot time-best">9:00 AM - 9:59 AM</div>
+                        <p style="margin-top: 10px;"><strong>78.6% Win Rate</strong> - Prioritize ALL Score 4-5 setups</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">✅</span>
+                            Strong Sessions
+                        </div>
+                        <div class="time-slot time-good">8:30 AM - 9:00 AM (60% WR)</div>
+                        <div class="time-slot time-good">9:00 AM - 11:30 AM (68% WR)</div>
+                        <div class="time-slot time-good">1:30 PM - 3:00 PM (70% WR)</div>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">⚠️</span>
+                            Danger Zone (Score 5 Only)
+                        </div>
+                        <div class="time-slot time-caution">11:30 AM - 1:30 PM (56.5% WR)</div>
+                        <div class="time-slot time-danger">12:00 PM - 12:59 PM (46.2% WR - WORST)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Stop Position Calculator -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">2</span>
+                    STOP POSITION CALCULATOR
+                </div>
+                <div class="section-content">
+                    <div class="calculator">
+                        <h3>📊 Calculate Your Stop & Position Size</h3>
+                        
+                        <div class="input-group">
+                            <label>Entry Price:</label>
+                            <input type="number" id="entryPrice" placeholder="e.g., 400.00" step="0.01">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Stop Level:</label>
+                            <input type="number" id="stopLevel" placeholder="e.g., 397.52" step="0.01">
+                        </div>
+
+                        <button class="calc-btn" onclick="calculatePosition()">Calculate Position</button>
+                        <button class="reset-btn" onclick="resetCalculator()">Reset</button>
+
+                        <div id="calcResults" class="result" style="display: none;">
+                            <div class="result-item">
+                                <span>Stop Distance ($):</span>
+                                <span class="result-value" id="stopDistance">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Stop Distance (%):</span>
+                                <span class="result-value" id="stopPercent">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Target Price:</span>
+                                <span class="result-value" id="targetPrice">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Share Count:</span>
+                                <span class="result-value" id="shareCount">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Setup Quality:</span>
+                                <span class="result-value" id="setupQuality">-</span>
+                            </div>
+                            <div class="result-item">
+                                <span>Expected Win Rate:</span>
+                                <span class="result-value" id="expectedWR">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>🎯 Sweet Spot: 0.55% - 0.70% stop distance = 82.4% Win Rate</strong>
+                        <p style="margin-top: 10px;">At TSLA $400: Stop = $2.20 - $2.80 | Shares = ~403</p>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>TSLA Price</th>
+                                <th>Sweet Spot Stop $</th>
+                                <th>Target $</th>
+                                <th>Shares</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>$200</td><td>$1.10 - $1.40</td><td>$1.32 - $1.68</td><td>710-910</td></tr>
+                            <tr><td>$300</td><td>$1.65 - $2.10</td><td>$1.98 - $2.52</td><td>475-605</td></tr>
+                            <tr><td>$400</td><td>$2.20 - $2.80</td><td>$2.64 - $3.36</td><td>355-455</td></tr>
+                            <tr><td>$500</td><td>$2.75 - $3.50</td><td>$3.30 - $4.20</td><td>285-365</td></tr>
+                            <tr><td>$600</td><td>$3.30 - $4.20</td><td>$3.96 - $5.04</td><td>240-305</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section 3: Target Goal -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">3</span>
+                    TARGET GOAL
+                </div>
+                <div class="section-content">
+                    <div class="success-box">
+                        <h3>Primary Target: 1.2R (Always)</h3>
+                        <p><strong>Risk:</strong> 1R = $1,000</p>
+                        <p><strong>Target:</strong> 1.2R = $1,200 profit</p>
+                        <p style="margin-top: 10px;"><strong>Formula:</strong> Target Distance = Stop Distance × 1.2</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Trailing Stop (Optional)</div>
+                        <p>After +$800 profit → Move stop to 20 EMA or break-even</p>
+                        <p>Let winner run to full 1.2R if momentum strong</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Pause Rules -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">4</span>
+                    PAUSE RULES
+                </div>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <strong>What is a Pause?</strong>
+                        <p>Brief consolidation within a momentum move (on 2-min chart) where price temporarily stops pushing before continuation.</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">✅</span>
+                            Ideal Pause (Score 5)
+                        </div>
+                        <ul class="checklist">
+                            <li><input type="checkbox"> 2-3 candles (4-6 minutes)</li>
+                            <li><input type="checkbox"> Volume DROPPING on pause</li>
+                            <li><input type="checkbox"> Small-bodied candles</li>
+                            <li><input type="checkbox"> Price respects 10 EMA</li>
+                            <li><input type="checkbox"> No closes wrong side of 10 EMA</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Entry Mechanics</div>
+                        <p><strong>LONG:</strong> Price breaks ABOVE highest point of pause candles</p>
+                        <p><strong>SHORT:</strong> Price breaks BELOW lowest point of pause candles</p>
+                        <p style="margin-top: 10px;"><strong>Stop Placement:</strong></p>
+                        <p>LONG: Below lowest point of pause | SHORT: Above highest point of pause</p>
+                    </div>
+
+                    <div class="danger-box">
+                        <strong>❌ Skip These Pauses</strong>
+                        <ul style="margin-top: 10px;">
+                            <li>6+ candles (momentum died)</li>
+                            <li>Volume increasing during pause</li>
+                            <li>Multiple closes wrong side of 10 EMA</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Trade Sequencing -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">5</span>
+                    TRADE SEQUENCING (Win/Loss Patterns)
+                </div>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        <strong>🔥 Critical Discovery: You Trade BETTER After Losses!</strong>
+                        <p style="margin-top: 10px;">After WIN → 49.0% WR | After LOSS → 65.7% WR</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">🥇</span>
+                            Trade #1 of Day
+                        </div>
+                        <p><strong>Win Rate: 71.4%</strong> (Your BEST performance)</p>
+                        <p>Rule: Take ALL Score 4-5 setups for first trade</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">⚠️</span>
+                            After a WIN (W)
+                        </div>
+                        <p><strong>Next Trade Win Rate: 49.0%</strong></p>
+                        <p style="color: #dc3545; font-weight: bold;">Rule: Score 5 setups ONLY</p>
+                        <p>This is where you give back profits - be MORE selective!</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">
+                            <span class="icon">✅</span>
+                            After a LOSS (L)
+                        </div>
+                        <p><strong>Next Trade Win Rate: 65.7%</strong></p>
+                        <p style="color: #28a745; font-weight: bold;">Rule: Take Score 4-5 normally</p>
+                        <p>You refocus after losses - no tilt detected!</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">After Win-Win (WW)</div>
+                        <p><strong>Average Day: $2,257</strong></p>
+                        <p>Consider STOPPING for day to preserve excellent result</p>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">After Loss-Loss (LL)</div>
+                        <p><strong>Next Trade: 66.7% WR</strong></p>
+                        <p>Take ONE more if Score 5. If that loses (LLL), STOP for day.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Pre-Trade Checklist -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">6</span>
+                    PRE-TRADE CHECKLIST
+                </div>
+                <div class="section-content">
+                    <div class="danger-box">
+                        <strong>ALL boxes must be checked before entering trade!</strong>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Timing</div>
+                        <ul class="checklist">
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Market is open (8:30 AM - 3:00 PM)</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Not 11:30 AM - 1:30 PM OR this is Score 5</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Taken fewer than 4 trades today</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Below +$3,000 profit today</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Sequence</div>
+                        <ul class="checklist">
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> First trade OR last was LOSS (take 4-5) OR last was WIN (5 only)</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Not on 2+ loss streak (if LL, Score 5 only)</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Setup Quality</div>
+                        <ul class="checklist">
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> 15-min cloud aligned</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> 2-5 candle pause</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Volume dropping on pause</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Price respecting 10 EMA</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Calculation</div>
+                        <ul class="checklist">
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Stop % is 0.55-0.70% (Score 5) OR 0.40-0.90% (Score 4)</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Share count is 200+</li>
+                        </ul>
+                    </div>
+
+                    <div class="subsection">
+                        <div class="subsection-title">Gut Check</div>
+                        <ul class="checklist">
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Feel confident about this trade</li>
+                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Would take this in backtest</li>
+                        </ul>
+                    </div>
+
+                    <button class="reset-btn" onclick="resetAllCheckboxes()">Reset All Checkboxes</button>
+                </div>
+            </div>
+
+            <!-- Section 7: Daily Limits -->
+            <div class="section">
+                <div class="section-header">
+                    <span class="number">7</span>
+                    DAILY LIMITS & STOPPING RULES
+                </div>
+                <div class="section-content">
+                    <div class="danger-box">
+                        <strong>🛑 HARD STOPS (Walk Away Immediately):</strong>
+                        <ul style="margin-top: 10px;">
+                            <li>3 consecutive losses (LLL)</li>
+                            <li>+$3,000 daily profit reached</li>
+                            <li>-$2,500 daily loss reached</li>
+                            <li>4 trades taken today</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-box">
+                        <strong>⚠️ Soft Stops (Consider Stopping):</strong>
+                        <ul style="margin-top: 10px;">
+                            <li>After WW (two wins) - captured $2,257 avg day</li>
+                            <li>Feeling "off" or uncertain</li>
+                            <li>After 3 trades in danger zone (11:30-1:30)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Your Edge is REAL: 62% baseline, 82.4% in sweet spot</strong></p>
+            <p>Now EXECUTE it systematically.</p>
+        </div>
+    </div>
+
+    <script>
+        function calculatePosition() {
+            const entry = parseFloat(document.getElementById('entryPrice').value);
+            const stop = parseFloat(document.getElementById('stopLevel').value);
+
+            if (!entry || !stop) {
+                alert('Please enter both Entry Price and Stop Level');
+                return;
+            }
+
+            // Calculate stop distance
+            const stopDistance = Math.abs(entry - stop);
+            const stopPercent = (stopDistance / entry) * 100;
+            
+            // Calculate target (1.2R)
+            const targetDistance = stopDistance * 1.2;
+            const targetPrice = entry > stop ? entry + targetDistance : entry - targetDistance;
+            
+            // Calculate shares
+            const shares = Math.floor(1000 / stopDistance);
+
+            // Determine quality
+            let quality = '';
+            let qualityClass = '';
+            let expectedWR = '';
+
+            if (stopPercent >= 0.55 && stopPercent <= 0.70) {
+                quality = 'Score 5 (SWEET SPOT)';
+                qualityClass = 'quality-score-5';
+                expectedWR = '82.4%';
+            } else if (stopPercent >= 0.40 && stopPercent <= 0.90) {
+                quality = 'Score 4 (Good)';
+                qualityClass = 'quality-score-4';
+                expectedWR = '72-82%';
+            } else if (stopPercent < 0.25) {
+                quality = 'SKIP (Too Tight)';
+                qualityClass = 'quality-skip';
+                expectedWR = '63%';
+            } else if (stopPercent > 0.90) {
+                quality = 'SKIP (Too Wide)';
+                qualityClass = 'quality-skip';
+                expectedWR = '<72%';
+            } else {
+                quality = 'Marginal';
+                qualityClass = 'quality-score-4';
+                expectedWR = '60-70%';
+            }
+
+            // Display results
+            document.getElementById('stopDistance').textContent = '$' + stopDistance.toFixed(2);
+            document.getElementById('stopPercent').textContent = stopPercent.toFixed(2) + '%';
+            document.getElementById('targetPrice').textContent = '$' + targetPrice.toFixed(2);
+            document.getElementById('shareCount').textContent = shares + ' shares';
+            
+            const qualityElement = document.getElementById('setupQuality');
+            qualityElement.innerHTML = `<span class="quality-indicator ${qualityClass}">${quality}</span>`;
+            
+            document.getElementById('expectedWR').textContent = expectedWR;
+            document.getElementById('calcResults').style.display = 'block';
+        }
+
+        function resetCalculator() {
+            document.getElementById('entryPrice').value = '';
+            document.getElementById('stopLevel').value = '';
+            document.getElementById('calcResults').style.display = 'none';
+        }
+
+        function updateCheckbox(checkbox) {
+            if (checkbox.checked) {
+                checkbox.parentElement.classList.add('checked');
+            } else {
+                checkbox.parentElement.classList.remove('checked');
+            }
+        }
+
+        function resetAllCheckboxes() {
+            const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+                cb.parentElement.classList.remove('checked');
+            });
+        }
+    </script>
+</body>
+</html>
