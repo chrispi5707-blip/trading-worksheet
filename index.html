@@ -1,831 +1,412 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10 EMA Momentum Trading Worksheet</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
-        .stats-bar {
-            background: #f8f9fa;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            border-bottom: 3px solid #667eea;
-        }
-
-        .stat {
-            text-align: center;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .section-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 20px;
-            font-size: 1.4em;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-
-        .section-header .number {
-            background: white;
-            color: #667eea;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-weight: bold;
-        }
-
-        .section-content {
-            padding: 20px;
-        }
-
-        .subsection {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-
-        .subsection-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .icon {
-            margin-right: 10px;
-            font-size: 1.3em;
-        }
-
-        .checklist {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .checklist li {
-            padding: 10px;
-            margin: 5px 0;
-            background: white;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .checklist li:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .checklist input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 15px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-
-        .checklist li.checked {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-        }
-
-        .calculator {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .calculator h3 {
-            color: #2d3436;
-            margin-bottom: 15px;
-        }
-
-        .input-group {
-            margin: 15px 0;
-            display: grid;
-            grid-template-columns: 150px 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .input-group label {
-            font-weight: bold;
-            color: #2d3436;
-        }
-
-        .input-group input {
-            padding: 10px;
-            border: 2px solid #dfe6e9;
-            border-radius: 5px;
-            font-size: 1em;
-            width: 100%;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .result {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            border-left: 4px solid #667eea;
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
-        .result-value {
-            font-weight: bold;
-            color: #667eea;
-            font-size: 1.1em;
-        }
-
-        .quality-indicator {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .quality-score-5 {
-            background: #4caf50;
-            color: white;
-        }
-
-        .quality-score-4 {
-            background: #ff9800;
-            color: white;
-        }
-
-        .quality-skip {
-            background: #f44336;
-            color: white;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .table th {
-            background: #667eea;
-            color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: bold;
-        }
-
-        .table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .highlight-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .success-box {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .danger-box {
-            background: #f8d7da;
-            border-left: 4px solid #dc3545;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-
-        .reset-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            margin: 10px 5px;
-            transition: all 0.3s;
-        }
-
-        .reset-btn:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .calc-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
-            font-size: 1em;
-            cursor: pointer;
-            margin: 10px 5px;
-            transition: all 0.3s;
-        }
-
-        .calc-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .time-slot {
-            display: inline-block;
-            padding: 8px 15px;
-            margin: 5px;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .time-best {
-            background: #4caf50;
-            color: white;
-        }
-
-        .time-good {
-            background: #2196f3;
-            color: white;
-        }
-
-        .time-caution {
-            background: #ff9800;
-            color: white;
-        }
-
-        .time-danger {
-            background: #f44336;
-            color: white;
-        }
-
-        @media (max-width: 768px) {
-            .input-group {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats-bar {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 1.8em;
-            }
-        }
-
-        .footer {
-            background: #2d3436;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 40px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade Journal</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e17;color:#e0e6ed;font-family:'IBM Plex Sans',-apple-system,sans-serif}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0a0e17}
+::-webkit-scrollbar-thumb{background:#1e2d3d;border-radius:3px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎯 10 EMA Momentum Trading Worksheet</h1>
-            <p>Complete Trading Rules & Real-Time Calculator</p>
-        </div>
+<div id="root"></div>
+<script>
+(function(){
+"use strict";
+var h=React.createElement;
+var useState=React.useState,useEffect=React.useEffect,useCallback=React.useCallback,useRef=React.useRef,useMemo=React.useMemo;
+var RC=Recharts;
 
-        <div class="stats-bar">
-            <div class="stat">
-                <div class="stat-value">62%</div>
-                <div class="stat-label">Overall Win Rate</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">82.4%</div>
-                <div class="stat-label">Sweet Spot Win Rate</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">$1,618</div>
-                <div class="stat-label">Avg Daily Profit</div>
-            </div>
-            <div class="stat">
-                <div class="stat-value">0.55-0.70%</div>
-                <div class="stat-label">Optimal Stop %</div>
-            </div>
-        </div>
+var EMPTY={id:"",date:"",time:"",exitTime:"",direction:"L",type:"Rev",ticker:"TSLA",
+  entry:"",stop:"",exit:"",shares:"",mfePrice:"",maePrice:"",adxAtEntry:"",cloudThickness:"",
+  screenshotUrl:"",screenshotData:"",
+  rules:{ultHL:"",lhHL:"",chanBreak:"",chanRetest:"",candleOff10:"",secondCandle:"",
+    macdCross:"",cloudAlign:"",rsiExtreme:"",divPresent:"",cloud15m:""},
+  stopMgmt:{initStop:"",stopChan:"",trailHL:"",stopMoved:"",reentry:""},
+  exitType:"",rsiAtExit:"",volAtExit:"",notes:""};
 
-        <div class="content">
-            <!-- Section 1: Time of Day -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">1</span>
-                    TIME OF DAY (CST)
-                </div>
-                <div class="section-content">
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">⭐</span>
-                            Golden Hour (BEST)
-                        </div>
-                        <div class="time-slot time-best">9:00 AM - 9:59 AM</div>
-                        <p style="margin-top: 10px;"><strong>78.6% Win Rate</strong> - Prioritize ALL Score 4-5 setups</p>
-                    </div>
+var RL={ultHL:"Ultimate H/L",lhHL:"LH / HL",chanBreak:"Chan Break",chanRetest:"Chan Retest",
+  candleOff10:"1st Candle 10EMA",secondCandle:"2nd Candle Entry",macdCross:"MACD Cross",
+  cloudAlign:"Cloud Align",rsiExtreme:"RSI Extreme",divPresent:"Divergence",cloud15m:"15m Cloud"};
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">✅</span>
-                            Strong Sessions
-                        </div>
-                        <div class="time-slot time-good">8:30 AM - 9:00 AM (60% WR)</div>
-                        <div class="time-slot time-good">9:00 AM - 11:30 AM (68% WR)</div>
-                        <div class="time-slot time-good">1:30 PM - 3:00 PM (70% WR)</div>
-                    </div>
+var SL={initStop:"Init Stop HL",stopChan:"Stop\u2192Chan",trailHL:"Trail H/L",stopMoved:"Stop Moved",reentry:"Re-entry"};
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">⚠️</span>
-                            Danger Zone (Score 5 Only)
-                        </div>
-                        <div class="time-slot time-caution">11:30 AM - 1:30 PM (56.5% WR)</div>
-                        <div class="time-slot time-danger">12:00 PM - 12:59 PM (46.2% WR - WORST)</div>
-                    </div>
-                </div>
-            </div>
+var K={bg:"#0a0e17",card:"#0f1923",border:"#1e2d3d",green:"#2ed573",red:"#ff4757",gold:"#ffa502",cyan:"#1e90ff",purple:"#a855f7",text:"#e0e6ed",dim:"#6b7a8d",input:"#1a2435"};
 
-            <!-- Section 2: Stop Position Calculator -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">2</span>
-                    STOP POSITION CALCULATOR
-                </div>
-                <div class="section-content">
-                    <div class="calculator">
-                        <h3>📊 Calculate Your Stop & Position Size</h3>
-                        
-                        <div class="input-group">
-                            <label>Entry Price:</label>
-                            <input type="number" id="entryPrice" placeholder="e.g., 400.00" step="0.01">
-                        </div>
+function gid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function dc(o){return JSON.parse(JSON.stringify(o))}
 
-                        <div class="input-group">
-                            <label>Stop Level:</label>
-                            <input type="number" id="stopLevel" placeholder="e.g., 397.52" step="0.01">
-                        </div>
+function cPL(t){
+  if(!t.entry||!t.exit||!t.shares)return{pl:0,plPct:0,rMult:0};
+  var e=parseFloat(t.entry),x=parseFloat(t.exit),s=parseFloat(t.stop),sh=parseFloat(t.shares);
+  var pl=t.direction==="L"?(x-e)*sh:(e-x)*sh;
+  var plPct=t.direction==="L"?(x-e)/e:(e-x)/e;
+  var risk=Math.abs(e-s);
+  var rMult=risk>0?(t.direction==="L"?(x-e)/risk:(e-x)/risk):0;
+  return{pl:pl,plPct:plPct,rMult:rMult};
+}
+function cMFE(t){
+  if(!t.entry||!t.mfePrice)return null;
+  var e=parseFloat(t.entry),mfe=parseFloat(t.mfePrice),x=t.exit?parseFloat(t.exit):null;
+  var md=t.direction==="L"?mfe-e:e-mfe;
+  var ed=x?(t.direction==="L"?x-e:e-x):null;
+  var cp=ed!==null&&md>0?ed/md:null;
+  return{mfeDist:md,capturePct:cp};
+}
+function cMAE(t){
+  if(!t.entry||!t.maePrice)return null;
+  var e=parseFloat(t.entry),mae=parseFloat(t.maePrice);
+  return{maeDist:t.direction==="L"?e-mae:mae-e};
+}
+function cDur(t){
+  if(!t.time||!t.exitTime)return null;
+  function tm(s){var p=s.split(":");return parseInt(p[0])*60+parseInt(p[1]||0);}
+  var d=tm(t.exitTime)-tm(t.time);if(d<=0)return null;
+  var hr=Math.floor(d/60),mn=d%60;
+  return{minutes:d,label:hr>0?hr+"h "+mn+"m":mn+"m"};
+}
+function gs(arr){
+  if(!arr.length)return{trades:0,winRate:0,avgR:0,avgPL:0};
+  var r=arr.map(cPL);var w=r.filter(function(x){return x.pl>0});
+  return{trades:arr.length,winRate:w.length/arr.length,avgR:r.reduce(function(s,x){return s+x.rMult},0)/arr.length,
+    avgPL:r.reduce(function(s,x){return s+x.pl},0)/arr.length};
+}
+// Components
+function Pill(p){
+  return h("div",{style:{display:"flex",gap:2,background:K.bg,borderRadius:6,padding:2}},
+    p.options.map(function(o){return h("button",{key:o.v,onClick:function(){p.onChange(o.v)},style:{
+      padding:"4px 10px",borderRadius:5,border:"none",fontSize:11,fontWeight:600,cursor:"pointer",
+      background:p.v===o.v?(o.c||K.cyan):"transparent",color:p.v===o.v?"#fff":K.dim,transition:"all .15s"}},o.l)}));}
 
-                        <button class="calc-btn" onclick="calculatePosition()">Calculate Position</button>
-                        <button class="reset-btn" onclick="resetCalculator()">Reset</button>
+function YNP(p){return h(Pill,{v:p.v,onChange:p.onChange,options:[{v:"Y",l:"Y",c:K.green},{v:"N",l:"N",c:K.red},{v:"",l:"-",c:K.dim}]});}
 
-                        <div id="calcResults" class="result" style="display: none;">
-                            <div class="result-item">
-                                <span>Stop Distance ($):</span>
-                                <span class="result-value" id="stopDistance">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span>Stop Distance (%):</span>
-                                <span class="result-value" id="stopPercent">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span>Target Price:</span>
-                                <span class="result-value" id="targetPrice">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span>Share Count:</span>
-                                <span class="result-value" id="shareCount">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span>Setup Quality:</span>
-                                <span class="result-value" id="setupQuality">-</span>
-                            </div>
-                            <div class="result-item">
-                                <span>Expected Win Rate:</span>
-                                <span class="result-value" id="expectedWR">-</span>
-                            </div>
-                        </div>
-                    </div>
+function Inp(p){return h("input",{type:p.type||"text",value:p.value||"",onChange:function(e){p.onChange(e.target.value)},
+  placeholder:p.placeholder,step:p.step,
+  style:Object.assign({background:K.input,border:"1px solid "+K.border,borderRadius:6,padding:"6px 10px",
+    color:K.text,fontSize:12,width:"100%",outline:"none"},p.style||{})});}
 
-                    <div class="success-box">
-                        <strong>🎯 Sweet Spot: 0.55% - 0.70% stop distance = 82.4% Win Rate</strong>
-                        <p style="margin-top: 10px;">At TSLA $400: Stop = $2.20 - $2.80 | Shares = ~403</p>
-                    </div>
+function SC(p){return h("div",{style:{background:K.card,border:"1px solid "+K.border,borderRadius:8,padding:"10px 14px",flex:1,minWidth:105}},
+  h("div",{style:{fontSize:9,color:K.dim,marginBottom:3}},p.label),
+  h("div",{style:{fontSize:17,fontWeight:700,color:p.color||K.text,fontFamily:"JetBrains Mono,monospace"}},p.value),
+  p.sub?h("div",{style:{fontSize:8,color:K.dim,marginTop:2}},p.sub):null);}
 
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>TSLA Price</th>
-                                <th>Sweet Spot Stop $</th>
-                                <th>Target $</th>
-                                <th>Shares</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>$200</td><td>$1.10 - $1.40</td><td>$1.32 - $1.68</td><td>710-910</td></tr>
-                            <tr><td>$300</td><td>$1.65 - $2.10</td><td>$1.98 - $2.52</td><td>475-605</td></tr>
-                            <tr><td>$400</td><td>$2.20 - $2.80</td><td>$2.64 - $3.36</td><td>355-455</td></tr>
-                            <tr><td>$500</td><td>$2.75 - $3.50</td><td>$3.30 - $4.20</td><td>285-365</td></tr>
-                            <tr><td>$600</td><td>$3.30 - $4.20</td><td>$3.96 - $5.04</td><td>240-305</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+function LB(p){if(!p.src)return null;
+  return h("div",{onClick:p.onClose,style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.92)",
+    zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",cursor:"zoom-out"}},
+    h("img",{src:p.src,alt:"",style:{maxWidth:"94vw",maxHeight:"94vh",borderRadius:8}}),
+    h("div",{style:{position:"absolute",top:16,right:24,color:"#fff",fontSize:28,cursor:"pointer",fontWeight:700}},"\u00d7"));}
 
-            <!-- Section 3: Target Goal -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">3</span>
-                    TARGET GOAL
-                </div>
-                <div class="section-content">
-                    <div class="success-box">
-                        <h3>Primary Target: 1.2R (Always)</h3>
-                        <p><strong>Risk:</strong> 1R = $1,000</p>
-                        <p><strong>Target:</strong> 1.2R = $1,200 profit</p>
-                        <p style="margin-top: 10px;"><strong>Formula:</strong> Target Distance = Stop Distance × 1.2</p>
-                    </div>
+function App(){
+  var _t=useState(function(){try{var d=localStorage.getItem("tj-data");return d?JSON.parse(d):[];}catch(e){return[];}});
+  var trades=_t[0],setTrades=_t[1];
+  var _v=useState("log"),view=_v[0],setView=_v[1];
+  var _e=useState(null),editTrade=_e[0],setEditTrade=_e[1];
+  var _sf=useState(false),showForm=_sf[0],setShowForm=_sf[1];
+  var _lb=useState(null),lbSrc=_lb[0],setLbSrc=_lb[1];
+  var _fd=useState("ALL"),fDir=_fd[0],setFDir=_fd[1];
+  var _ft=useState("ALL"),fType=_ft[0],setFType=_ft[1];
+  var _fk=useState("ALL"),fTick=_fk[0],setFTick=_fk[1];
+  var _qm=useState(false),qm=_qm[0],setQm=_qm[1];
+  var fRef=useRef(null),iRef=useRef(null);
 
-                    <div class="subsection">
-                        <div class="subsection-title">Trailing Stop (Optional)</div>
-                        <p>After +$800 profit → Move stop to 20 EMA or break-even</p>
-                        <p>Let winner run to full 1.2R if momentum strong</p>
-                    </div>
-                </div>
-            </div>
+  useEffect(function(){try{localStorage.setItem("tj-data",JSON.stringify(trades));}catch(e){}},[trades]);
 
-            <!-- Section 4: Pause Rules -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">4</span>
-                    PAUSE RULES
-                </div>
-                <div class="section-content">
-                    <div class="highlight-box">
-                        <strong>What is a Pause?</strong>
-                        <p>Brief consolidation within a momentum move (on 3-min chart) where price temporarily stops pushing before continuation.</p>
-                    </div>
+  function mkN(){var t=dc(EMPTY);t.id=gid();t.date=new Date().toISOString().slice(0,10);return t;}
+  function oNew(){setEditTrade(mkN());setShowForm(true);setQm(false);}
+  function oQuick(){setEditTrade(mkN());setShowForm(true);setQm(true);}
+  function oEdit(t){var c=dc(t);c.rules=Object.assign(dc(EMPTY.rules),c.rules||{});c.stopMgmt=Object.assign(dc(EMPTY.stopMgmt),c.stopMgmt||{});setEditTrade(c);setShowForm(true);setQm(false);}
+  function save(){if(!editTrade)return;setTrades(function(p){var i=-1;for(var j=0;j<p.length;j++){if(p[j].id===editTrade.id){i=j;break;}}if(i>=0){var n=p.slice();n[i]=editTrade;return n;}return p.concat([editTrade]);});setShowForm(false);setEditTrade(null);}
+  function del(id){if(confirm("Delete this trade?")){setTrades(function(p){return p.filter(function(t){return t.id!==id})});}}
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">✅</span>
-                            Ideal Pause (Score 5)
-                        </div>
-                        <ul class="checklist">
-                            <li><input type="checkbox"> 2-3 candles (4-6 minutes)</li>
-                            <li><input type="checkbox"> Volume DROPPING on pause</li>
-                            <li><input type="checkbox"> Small-bodied candles</li>
-                            <li><input type="checkbox"> Price respects 10 EMA</li>
-                            <li><input type="checkbox"> No closes wrong side of 10 EMA</li>
-                        </ul>
-                    </div>
+  function hFile(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){setEditTrade(function(p){var c=dc(p);c.screenshotData=ev.target.result;return c;});};r.readAsDataURL(f);}
+  var hDrop=useCallback(function(e){e.preventDefault();var f=e.dataTransfer.files[0];if(!f||!f.type.startsWith("image/"))return;var r=new FileReader();r.onload=function(ev){setEditTrade(function(p){var c=dc(p);c.screenshotData=ev.target.result;return c;});};r.readAsDataURL(f);},[]);
 
-                    <div class="subsection">
-                        <div class="subsection-title">Entry Mechanics</div>
-                        <p><strong>LONG:</strong> Price breaks ABOVE highest point of pause candles</p>
-                        <p><strong>SHORT:</strong> Price breaks BELOW lowest point of pause candles</p>
-                        <p style="margin-top: 10px;"><strong>Stop Placement:</strong></p>
-                        <p>LONG: Below lowest point of pause | SHORT: Above highest point of pause</p>
-                    </div>
+  var filt=useMemo(function(){return trades.filter(function(t){
+    if(fDir!=="ALL"&&t.direction!==fDir)return false;if(fType!=="ALL"&&t.type!==fType)return false;
+    if(fTick!=="ALL"&&t.ticker!==fTick)return false;return true;
+  }).sort(function(a,b){return(b.date+b.time).localeCompare(a.date+a.time)});},[trades,fDir,fType,fTick]);
 
-                    <div class="danger-box">
-                        <strong>❌ Skip These Pauses</strong>
-                        <ul style="margin-top: 10px;">
-                            <li>6+ candles (momentum died)</li>
-                            <li>Volume increasing during pause</li>
-                            <li>Multiple closes wrong side of 10 EMA</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+  var ticks=useMemo(function(){var s={};trades.forEach(function(t){if(t.ticker)s[t.ticker]=1});return Object.keys(s);},[trades]);
+  var comp=useMemo(function(){return trades.filter(function(t){return t.entry&&t.exit&&t.shares})},[trades]);
 
-            <!-- Section 5: Trade Sequencing -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">5</span>
-                    TRADE SEQUENCING (Win/Loss Patterns)
-                </div>
-                <div class="section-content">
-                    <div class="highlight-box">
-                        <strong>🔥 Critical Discovery: You Trade BETTER After Losses!</strong>
-                        <p style="margin-top: 10px;">After WIN → 49.0% WR | After LOSS → 65.7% WR</p>
-                    </div>
+  var stats=useMemo(function(){
+    var t=filt.filter(function(tr){return tr.entry&&tr.exit&&tr.shares});if(!t.length)return null;
+    var res=t.map(function(tr){var p=cPL(tr);return{pl:p.pl,rMult:p.rMult,mfe:cMFE(tr),dur:cDur(tr)}});
+    var w=res.filter(function(r){return r.pl>0}),l=res.filter(function(r){return r.pl<0});
+    var durs=res.map(function(r){return r.dur}).filter(Boolean);
+    var caps=res.map(function(r){return r.mfe&&r.mfe.capturePct}).filter(function(c){return c!=null});
+    return{total:res.length,wins:w.length,losses:l.length,
+      wr:w.length/res.length,tpl:res.reduce(function(s,r){return s+r.pl},0),
+      aw:w.length?w.reduce(function(s,r){return s+r.pl},0)/w.length:0,
+      al:l.length?l.reduce(function(s,r){return s+r.pl},0)/l.length:0,
+      ar:res.reduce(function(s,r){return s+r.rMult},0)/res.length,
+      pf:l.length?Math.abs(w.reduce(function(s,r){return s+r.pl},0)/l.reduce(function(s,r){return s+r.pl},0)):w.length?999:0,
+      ad:durs.length?durs.reduce(function(s,d){return s+d.minutes},0)/durs.length:null,
+      ac:caps.length?caps.reduce(function(s,c){return s+c},0)/caps.length:null};
+  },[filt]);
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">🥇</span>
-                            Trade #1 of Day
-                        </div>
-                        <p><strong>Win Rate: 71.4%</strong> (Your BEST performance)</p>
-                        <p>Rule: Take ALL Score 4-5 setups for first trade</p>
-                    </div>
+  var eqC=useMemo(function(){
+    var s=comp.slice().sort(function(a,b){return(a.date+a.time).localeCompare(b.date+b.time)});
+    var cum=0;return s.map(function(t,i){var p=cPL(t);cum+=p.pl;return{idx:i+1,date:t.date,pl:p.pl,cumPL:cum,ticker:t.ticker}});
+  },[comp]);
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">⚠️</span>
-                            After a WIN (W)
-                        </div>
-                        <p><strong>Next Trade Win Rate: 49.0%</strong></p>
-                        <p style="color: #dc3545; font-weight: bold;">Rule: Score 5 setups ONLY</p>
-                        <p>This is where you give back profits - be MORE selective!</p>
-                    </div>
+  var rAnal=useMemo(function(){
+    if(!comp.length)return[];
+    var out=Object.keys(RL).map(function(k){
+      var wi=comp.filter(function(t){return t.rules[k]==="Y"});
+      var wo=comp.filter(function(t){return t.rules[k]==="N"});
+      return{key:k,label:RL[k],w:gs(wi),wo:gs(wo),edge:gs(wi).winRate-gs(wo).winRate,type:"yn"};});
+    var adxT=comp.filter(function(t){return t.adxAtEntry});
+    if(adxT.length>=3){out.push({key:"adx",label:"ADX at Entry",type:"num",edge:0,
+      bk:[{l:"< 20 (Weak)",s:gs(adxT.filter(function(t){return parseFloat(t.adxAtEntry)<20}))},
+        {l:"20-25 (Building)",s:gs(adxT.filter(function(t){var v=parseFloat(t.adxAtEntry);return v>=20&&v<25}))},
+        {l:"25+ (Strong)",s:gs(adxT.filter(function(t){return parseFloat(t.adxAtEntry)>=25}))}]});}
+    var clT=comp.filter(function(t){return t.cloudThickness});
+    if(clT.length>=3){out.push({key:"cl",label:"Cloud Width % at Entry",type:"num",edge:0,
+      bk:[{l:"< 0.15% (Thin)",s:gs(clT.filter(function(t){return parseFloat(t.cloudThickness)<0.15}))},
+        {l:"0.15-0.35% (Med)",s:gs(clT.filter(function(t){var v=parseFloat(t.cloudThickness);return v>=0.15&&v<0.35}))},
+        {l:"0.35%+ (Thick)",s:gs(clT.filter(function(t){return parseFloat(t.cloudThickness)>=0.35}))}]});}
+    var durT=comp.filter(function(t){return cDur(t)});
+    if(durT.length>=3){out.push({key:"dur",label:"Trade Duration",type:"num",edge:0,
+      bk:[{l:"< 10m (Scalp)",s:gs(durT.filter(function(t){return cDur(t).minutes<10}))},
+        {l:"10-30m",s:gs(durT.filter(function(t){var m=cDur(t).minutes;return m>=10&&m<30}))},
+        {l:"30m+ (Swing)",s:gs(durT.filter(function(t){return cDur(t).minutes>=30}))}]});}
+    return out.sort(function(a,b){if(a.type==="num"&&b.type!=="num")return 1;if(b.type==="num"&&a.type!=="num")return -1;return Math.abs(b.edge)-Math.abs(a.edge)});
+  },[comp]);
 
-                    <div class="subsection">
-                        <div class="subsection-title">
-                            <span class="icon">✅</span>
-                            After a LOSS (L)
-                        </div>
-                        <p><strong>Next Trade Win Rate: 65.7%</strong></p>
-                        <p style="color: #28a745; font-weight: bold;">Rule: Take Score 4-5 normally</p>
-                        <p>You refocus after losses - no tilt detected!</p>
-                    </div>
+  var mfeD=useMemo(function(){return comp.filter(function(t){return t.mfePrice}).map(function(t){
+    var p=cPL(t);var m=cMFE(t);return{capture:m&&m.capturePct!=null?(m.capturePct*100):null,rMult:p.rMult,pl:p.pl,ticker:t.ticker};
+  }).filter(function(d){return d.capture!==null})},[comp]);
 
-                    <div class="subsection">
-                        <div class="subsection-title">After Win-Win (WW)</div>
-                        <p><strong>Average Day: $2,257</strong></p>
-                        <p>Consider STOPPING for day to preserve excellent result</p>
-                    </div>
+  // FORM
+  function renderForm(){
+    if(!editTrade)return null;
+    var t=editTrade;
+    function u(k,v){setEditTrade(function(p){var c=dc(p);c[k]=v;return c})}
+    function ur(k,v){setEditTrade(function(p){var c=dc(p);c.rules[k]=v;return c})}
+    function us(k,v){setEditTrade(function(p){var c=dc(p);c.stopMgmt[k]=v;return c})}
+    var img=t.screenshotData||t.screenshotUrl;
+    var plP=(t.entry&&t.exit&&t.shares)?cPL(t):null;
+    var mfeP=(t.entry&&t.mfePrice)?cMFE(t):null;
+    var maeP=(t.entry&&t.maePrice)?cMAE(t):null;
+    var durP=cDur(t);
+    var pv=[];
+    if(plP){pv.push(h("div",{key:"pl",style:{flex:1,textAlign:"center",minWidth:65}},h("div",{style:{fontSize:8,color:K.dim}},"P/L"),h("div",{style:{fontSize:14,fontWeight:700,color:plP.pl>=0?K.green:K.red,fontFamily:"JetBrains Mono,monospace"}},"$"+plP.pl.toFixed(2))));
+      pv.push(h("div",{key:"r",style:{flex:1,textAlign:"center",minWidth:65}},h("div",{style:{fontSize:8,color:K.dim}},"R"),h("div",{style:{fontSize:14,fontWeight:700,color:plP.rMult>=0?K.green:K.red,fontFamily:"JetBrains Mono,monospace"}},plP.rMult.toFixed(2)+"R")));}
+    if(durP)pv.push(h("div",{key:"d",style:{flex:1,textAlign:"center",minWidth:65}},h("div",{style:{fontSize:8,color:K.dim}},"Duration"),h("div",{style:{fontSize:14,fontWeight:700,color:K.gold,fontFamily:"JetBrains Mono,monospace"}},durP.label)));
+    if(mfeP&&mfeP.capturePct!==null)pv.push(h("div",{key:"c",style:{flex:1,textAlign:"center",minWidth:65}},h("div",{style:{fontSize:8,color:K.dim}},"Captured"),h("div",{style:{fontSize:14,fontWeight:700,color:mfeP.capturePct>=.7?K.green:mfeP.capturePct>=.5?K.gold:K.red,fontFamily:"JetBrains Mono,monospace"}},(mfeP.capturePct*100).toFixed(0)+"%")));
+    if(maeP)pv.push(h("div",{key:"m",style:{flex:1,textAlign:"center",minWidth:65}},h("div",{style:{fontSize:8,color:K.dim}},"Drawdown"),h("div",{style:{fontSize:14,fontWeight:700,color:K.red,fontFamily:"JetBrains Mono,monospace"}},"-$"+maeP.maeDist.toFixed(2))));
 
-                    <div class="subsection">
-                        <div class="subsection-title">After Loss-Loss (LL)</div>
-                        <p><strong>Next Trade: 66.7% WR</strong></p>
-                        <p>Take ONE more if Score 5. If that loses (LLL), STOP for day.</p>
-                    </div>
-                </div>
-            </div>
+    var ruleEls=Object.keys(RL).map(function(k){return h("div",{key:k,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"3px 7px",background:K.bg,borderRadius:6}},h("span",{style:{fontSize:9,color:K.dim}},RL[k]),h(YNP,{v:t.rules[k],onChange:function(v){ur(k,v)}}))});
+    var stopEls=Object.keys(SL).map(function(k){return h("div",{key:k,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"3px 7px",background:K.bg,borderRadius:6}},h("span",{style:{fontSize:9,color:K.dim}},SL[k]),h(YNP,{v:t.stopMgmt[k],onChange:function(v){us(k,v)}}))});
+    var qKeys=["macdCross","divPresent","rsiExtreme","cloudAlign","chanRetest","cloud15m"];
+    var qEls=qKeys.map(function(k){return h("div",{key:k,style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"3px 7px",background:K.bg,borderRadius:6}},h("span",{style:{fontSize:9,color:K.dim}},RL[k]),h(YNP,{v:t.rules[k],onChange:function(v){ur(k,v)}}))});
 
-            <!-- Section 6: Pre-Trade Checklist -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">6</span>
-                    PRE-TRADE CHECKLIST
-                </div>
-                <div class="section-content">
-                    <div class="danger-box">
-                        <strong>ALL boxes must be checked before entering trade!</strong>
-                    </div>
+    return h("div",{style:{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,.85)",zIndex:1000,overflow:"auto",padding:"16px 8px"}},
+      h("div",{style:{maxWidth:qm?560:840,margin:"0 auto",background:K.card,borderRadius:12,border:"1px solid "+K.border,padding:22}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+          h("h2",{style:{color:K.gold,fontSize:16,margin:0,fontFamily:"JetBrains Mono,monospace"}},qm?"QUICK ENTRY":"TRADE ENTRY"),
+          h("div",{style:{display:"flex",gap:6}},
+            h("button",{onClick:function(){setQm(!qm)},style:{padding:"5px 10px",background:qm?K.cyan:K.purple,border:"none",borderRadius:6,color:"#fff",fontSize:10,cursor:"pointer"}},qm?"Full":"Quick"),
+            h("button",{onClick:function(){setShowForm(false);setEditTrade(null)},style:{padding:"5px 10px",background:K.red,border:"none",borderRadius:6,color:"#fff",fontSize:10,cursor:"pointer"}},"Cancel"))),
+        h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:10}},
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Date"),h(Inp,{value:t.date,onChange:function(v){u("date",v)},type:"date"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Entry Time"),h(Inp,{value:t.time,onChange:function(v){u("time",v)},placeholder:"10:32"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Exit Time"),h(Inp,{value:t.exitTime,onChange:function(v){u("exitTime",v)},placeholder:"10:47"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Ticker"),h(Inp,{value:t.ticker,onChange:function(v){u("ticker",v.toUpperCase())},placeholder:"TSLA"}))),
+        h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Direction"),h(Pill,{v:t.direction,onChange:function(v){u("direction",v)},options:[{v:"L",l:"LONG",c:K.green},{v:"S",l:"SHORT",c:K.red}]})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Type"),h(Pill,{v:t.type,onChange:function(v){u("type",v)},options:[{v:"Rev",l:"Reversal",c:K.cyan},{v:"Cont",l:"Continuation",c:K.gold}]}))),
+        h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:10}},
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Entry $"),h(Inp,{value:t.entry,onChange:function(v){u("entry",v)},placeholder:"452.30",type:"number",step:"0.01"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Stop $"),h(Inp,{value:t.stop,onChange:function(v){u("stop",v)},placeholder:"451.10",type:"number",step:"0.01"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Exit $"),h(Inp,{value:t.exit,onChange:function(v){u("exit",v)},placeholder:"454.80",type:"number",step:"0.01"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Shares"),h(Inp,{value:t.shares,onChange:function(v){u("shares",v)},placeholder:"400",type:"number"}))),
+        h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:10}},
+          h("div",null,h("div",{style:{fontSize:9,color:K.cyan,marginBottom:2}},"Best Price (MFE)"),h(Inp,{value:t.mfePrice,onChange:function(v){u("mfePrice",v)},placeholder:t.direction==="L"?"High":"Low",type:"number",step:"0.01"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.red,marginBottom:2}},"Worst Price (MAE)"),h(Inp,{value:t.maePrice,onChange:function(v){u("maePrice",v)},placeholder:t.direction==="L"?"Low dip":"High spike",type:"number",step:"0.01"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.gold,marginBottom:2}},"ADX at Entry"),h(Inp,{value:t.adxAtEntry,onChange:function(v){u("adxAtEntry",v)},placeholder:"25.3",type:"number",step:"0.1"})),
+          h("div",null,h("div",{style:{fontSize:9,color:K.purple,marginBottom:2}},"Cloud Width % at Entry"),h(Inp,{value:t.cloudThickness,onChange:function(v){u("cloudThickness",v)},placeholder:"0.25",type:"number",step:"0.01"}))),
+        pv.length>0?h("div",{style:{display:"flex",gap:6,marginBottom:12,padding:8,background:K.bg,borderRadius:8,flexWrap:"wrap"}},pv):null,
+        h("div",{style:{marginBottom:12}},
+          h("div",{style:{fontSize:10,color:K.dim,marginBottom:4,fontWeight:600}},"SCREENSHOT"),
+          h("div",{style:{display:"flex",gap:6,marginBottom:4}},
+            h(Inp,{value:t.screenshotUrl,onChange:function(v){u("screenshotUrl",v)},placeholder:"Paste TradingView URL...",style:{flex:1}}),
+            h("button",{onClick:function(){fRef.current&&fRef.current.click()},style:{padding:"5px 12px",background:K.cyan,border:"none",borderRadius:6,color:"#fff",fontSize:10,cursor:"pointer"}},"Upload"),
+            h("input",{ref:fRef,type:"file",accept:"image/*",onChange:hFile,style:{display:"none"}})),
+          h("div",{onDrop:hDrop,onDragOver:function(e){e.preventDefault()},style:{border:"2px dashed "+K.border,borderRadius:8,padding:img?4:16,textAlign:"center",color:K.dim,fontSize:10,cursor:"pointer",minHeight:img?40:50,display:"flex",alignItems:"center",justifyContent:"center",background:K.bg}},
+            img?h("img",{src:img,alt:"",onClick:function(){setLbSrc(img)},style:{maxWidth:"100%",maxHeight:160,borderRadius:6,cursor:"zoom-in"}}):"Drag & drop screenshot here")),
+        !qm?h("div",null,
+          h("div",{style:{fontSize:10,color:K.gold,marginBottom:6,fontWeight:700}},"SETUP RULES"),
+          h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5,marginBottom:12}},ruleEls),
+          h("div",{style:{fontSize:10,color:K.red,marginBottom:6,fontWeight:700}},"STOP MANAGEMENT"),
+          h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5,marginBottom:12}},stopEls),
+          h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}},
+            h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Exit Type"),h(Pill,{v:t.exitType,onChange:function(v){u("exitType",v)},options:[{v:"Trail",l:"Trail",c:K.green},{v:"Limit",l:"Limit",c:K.gold},{v:"Stop",l:"Stopped",c:K.red}]})),
+            h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"RSI at Exit"),h(Inp,{value:t.rsiAtExit,onChange:function(v){u("rsiAtExit",v)},placeholder:"78.5"})),
+            h("div",null,h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Vol at Exit"),h(Inp,{value:t.volAtExit,onChange:function(v){u("volAtExit",v)},placeholder:"H / M / L"}))),
+          h("div",{style:{marginBottom:12}},h("div",{style:{fontSize:9,color:K.dim,marginBottom:2}},"Notes"),h(Inp,{value:t.notes,onChange:function(v){u("notes",v)},placeholder:"Trade notes..."}))):null,
+        qm?h("div",{style:{marginBottom:12}},h("div",{style:{fontSize:10,color:K.gold,marginBottom:6,fontWeight:700}},"QUICK RULES"),h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5}},qEls)):null,
+        h("button",{onClick:save,style:{width:"100%",padding:"11px",background:K.green,border:"none",borderRadius:8,color:"#000",fontSize:13,fontWeight:700,cursor:"pointer"}},"SAVE TRADE")));
+  }
 
-                    <div class="subsection">
-                        <div class="subsection-title">Timing</div>
-                        <ul class="checklist">
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Market is open (8:30 AM - 3:00 PM)</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Not 11:30 AM - 1:30 PM OR this is Score 5</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Taken fewer than 4 trades today</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Below +$3,000 profit today</li>
-                        </ul>
-                    </div>
+  // LOG VIEW
+  function renderLog(){
+    var rows=filt.map(function(t){
+      var p=cPL(t);var mfe=cMFE(t);var dur=cDur(t);var img=t.screenshotData||t.screenshotUrl;var w=p.pl>0;
+      var mi=[h("span",{key:"e"},"E:"+t.entry),h("span",{key:"x"},"X:"+t.exit),h("span",{key:"s"},"\u00d7"+t.shares)];
+      if(dur)mi.push(h("span",{key:"d",style:{color:K.gold}},dur.label));
+      if(mfe&&mfe.capturePct!==null)mi.push(h("span",{key:"c",style:{color:mfe.capturePct>=.7?K.green:K.gold}},(mfe.capturePct*100).toFixed(0)+"%cap"));
+      if(t.adxAtEntry)mi.push(h("span",{key:"a",style:{color:parseFloat(t.adxAtEntry)>=25?K.green:K.gold}},"ADX:"+t.adxAtEntry));
+      if(t.cloudThickness)mi.push(h("span",{key:"cl",style:{color:K.purple}},"CW:"+t.cloudThickness+"%"));
+      return h("div",{key:t.id,onClick:function(){oEdit(t)},style:{display:"flex",alignItems:"center",gap:8,padding:"7px 10px",background:K.card,borderRadius:8,border:"1px solid "+K.border,borderLeft:"3px solid "+(w?K.green:p.pl<0?K.red:K.border),cursor:"pointer"}},
+        h("div",{style:{width:42,height:30,borderRadius:4,overflow:"hidden",flexShrink:0,background:K.bg,display:"flex",alignItems:"center",justifyContent:"center"}},
+          img?h("img",{src:img,alt:"",style:{width:"100%",height:"100%",objectFit:"cover"},onClick:function(e){e.stopPropagation();setLbSrc(img)}}):h("span",{style:{fontSize:7,color:K.dim}},"\u2014")),
+        h("div",{style:{minWidth:38,textAlign:"center"}},h("span",{style:{fontSize:10,fontWeight:700,color:t.direction==="L"?K.green:K.red,fontFamily:"JetBrains Mono,monospace"}},t.direction==="L"?"LONG":"SHORT"),h("div",{style:{fontSize:7,color:K.dim}},t.type)),
+        h("div",{style:{minWidth:42}},h("div",{style:{fontSize:10,fontWeight:600,color:K.text}},t.ticker),h("div",{style:{fontSize:8,color:K.dim}},t.date)),
+        h("div",{style:{flex:1,display:"flex",gap:10,alignItems:"center",fontSize:9,fontFamily:"JetBrains Mono,monospace",color:K.dim,flexWrap:"wrap"}},mi),
+        h("div",{style:{textAlign:"right",minWidth:70}},h("div",{style:{fontSize:13,fontWeight:700,color:w?K.green:p.pl<0?K.red:K.dim,fontFamily:"JetBrains Mono,monospace"}},"$"+p.pl.toFixed(2)),h("div",{style:{fontSize:8,color:w?K.green:p.pl<0?K.red:K.dim}},p.rMult.toFixed(2)+"R")),
+        h("button",{onClick:function(e){e.stopPropagation();del(t.id)},style:{padding:"2px 6px",background:"transparent",border:"1px solid "+K.border,borderRadius:4,color:K.red,fontSize:9,cursor:"pointer"}},"\u00d7"));
+    });
+    var sc=[];
+    if(stats){
+      sc.push(h(SC,{key:"wr",label:"Win Rate",value:(stats.wr*100).toFixed(1)+"%",color:stats.wr>=.5?K.green:K.red,sub:stats.wins+"W / "+stats.losses+"L"}));
+      sc.push(h(SC,{key:"tp",label:"Total P/L",value:"$"+stats.tpl.toFixed(0),color:stats.tpl>=0?K.green:K.red}));
+      sc.push(h(SC,{key:"ar",label:"Avg R",value:stats.ar.toFixed(2)+"R",color:stats.ar>=0?K.green:K.red}));
+      sc.push(h(SC,{key:"pf",label:"PF",value:stats.pf>=999?"\u221e":stats.pf.toFixed(2),color:stats.pf>=1.5?K.green:stats.pf>=1?K.gold:K.red}));
+      sc.push(h(SC,{key:"aw",label:"Avg Win",value:"$"+stats.aw.toFixed(0),color:K.green,sub:"Loss: $"+stats.al.toFixed(0)}));
+      if(stats.ad!==null)sc.push(h(SC,{key:"ad",label:"Avg Duration",value:stats.ad.toFixed(0)+"m",color:K.gold}));
+      if(stats.ac!==null)sc.push(h(SC,{key:"ac",label:"Avg Capture",value:(stats.ac*100).toFixed(0)+"%",color:stats.ac>=.7?K.green:stats.ac>=.5?K.gold:K.red,sub:"of max move"}));
+    }
+    var tickOpts=[h("option",{key:"ALL",value:"ALL"},"All Tickers")].concat(ticks.map(function(t){return h("option",{key:t,value:t},t)}));
+    return h("div",null,
+      h("div",{style:{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap",alignItems:"center"}},
+        h(Pill,{v:fDir,onChange:setFDir,options:[{v:"ALL",l:"All"},{v:"L",l:"Longs",c:K.green},{v:"S",l:"Shorts",c:K.red}]}),
+        h(Pill,{v:fType,onChange:setFType,options:[{v:"ALL",l:"All"},{v:"Rev",l:"Rev",c:K.cyan},{v:"Cont",l:"Cont",c:K.gold}]}),
+        ticks.length>1?h("select",{value:fTick,onChange:function(e){setFTick(e.target.value)},style:{background:K.input,border:"1px solid "+K.border,borderRadius:6,padding:"4px 8px",color:K.text,fontSize:10}},tickOpts):null,
+        h("div",{style:{flex:1}}),h("span",{style:{fontSize:10,color:K.dim}},filt.length+" trades")),
+      sc.length>0?h("div",{style:{display:"flex",gap:6,marginBottom:12,flexWrap:"wrap"}},sc):null,
+      h("div",{style:{display:"flex",flexDirection:"column",gap:4}},rows),
+      !filt.length?h("div",{style:{textAlign:"center",padding:40,color:K.dim}},"No trades yet. Click '+ New Trade' to start."):null);
+  }
 
-                    <div class="subsection">
-                        <div class="subsection-title">Sequence</div>
-                        <ul class="checklist">
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> First trade OR last was LOSS (take 4-5) OR last was WIN (5 only)</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Not on 2+ loss streak (if LL, Score 5 only)</li>
-                        </ul>
-                    </div>
+  // RULE ANALYSIS
+  function renderRules(){
+    var items=rAnal.map(function(r){
+      if(r.type==="num"){
+        var bks=r.bk.map(function(b,i){
+          return h("div",{key:i,style:{flex:1,minWidth:140,padding:8,background:K.bg,borderRadius:6}},
+            h("div",{style:{fontSize:10,fontWeight:600,color:K.text,marginBottom:4}},b.l),
+            h("div",{style:{fontSize:9,color:K.dim,lineHeight:"1.9"}},
+              h("span",{style:{color:K.text}},b.s.trades)," trades",h("br",null),
+              h("span",{style:{color:b.s.winRate>=.5?K.green:K.red,fontWeight:600}},(b.s.winRate*100).toFixed(1)+"%")," WR",h("br",null),
+              h("span",{style:{color:b.s.avgR>=0?K.green:K.red,fontFamily:"JetBrains Mono,monospace"}},b.s.avgR.toFixed(2)+"R")," avg",h("br",null),
+              h("span",{style:{color:b.s.avgPL>=0?K.green:K.red,fontFamily:"JetBrains Mono,monospace"}},"$"+b.s.avgPL.toFixed(0))," avg P/L"),
+            h("div",{style:{height:4,background:K.border,borderRadius:2,marginTop:4,overflow:"hidden"}},
+              h("div",{style:{height:"100%",width:b.s.winRate*100+"%",background:b.s.winRate>=.5?K.green:K.red,borderRadius:2}})));});
+        return h("div",{key:r.key,style:{background:K.card,borderRadius:8,border:"1px solid "+K.border,padding:"12px 14px"}},
+          h("div",{style:{fontSize:12,fontWeight:600,color:K.purple,marginBottom:8}},r.label+" \u2014 Bucket Analysis"),
+          h("div",{style:{display:"flex",gap:10,flexWrap:"wrap"}},bks));}
+      var ep=(r.edge*100).toFixed(1);
+      return h("div",{key:r.key,style:{background:K.card,borderRadius:8,border:"1px solid "+K.border,padding:"10px 14px"}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+          h("span",{style:{fontSize:12,fontWeight:600,color:K.text}},r.label),
+          h("span",{style:{fontSize:13,fontWeight:700,color:r.edge>.05?K.green:r.edge<-.05?K.red:K.dim,fontFamily:"JetBrains Mono,monospace"}},(r.edge>0?"+":"")+ep+"% edge")),
+        h("div",{style:{display:"flex",gap:14,fontSize:10}},
+          h("div",{style:{flex:1}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},h("span",{style:{color:K.green}},"Y: "+r.w.trades),h("span",{style:{color:K.green,fontFamily:"JetBrains Mono,monospace"}},(r.w.winRate*100).toFixed(1)+"% \u00b7 "+r.w.avgR.toFixed(2)+"R \u00b7 $"+r.w.avgPL.toFixed(0))),
+            h("div",{style:{height:3,background:K.bg,borderRadius:2,overflow:"hidden"}},h("div",{style:{height:"100%",width:r.w.winRate*100+"%",background:K.green,borderRadius:2}}))),
+          h("div",{style:{flex:1}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},h("span",{style:{color:K.red}},"N: "+r.wo.trades),h("span",{style:{color:K.red,fontFamily:"JetBrains Mono,monospace"}},(r.wo.winRate*100).toFixed(1)+"% \u00b7 "+r.wo.avgR.toFixed(2)+"R \u00b7 $"+r.wo.avgPL.toFixed(0))),
+            h("div",{style:{height:3,background:K.bg,borderRadius:2,overflow:"hidden"}},h("div",{style:{height:"100%",width:r.wo.winRate*100+"%",background:K.red,borderRadius:2}})))));
+    });
+    return h("div",null,
+      h("div",{style:{fontSize:11,color:K.dim,marginBottom:12}},"Y/N rules sorted by edge. Numeric fields show bucket breakdowns."),
+      !rAnal.length?h("div",{style:{textAlign:"center",padding:40,color:K.dim}},"Log trades with rules marked to see analysis."):
+      h("div",{style:{display:"flex",flexDirection:"column",gap:8}},items));
+  }
 
-                    <div class="subsection">
-                        <div class="subsection-title">Setup Quality</div>
-                        <ul class="checklist">
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> 15-min cloud aligned</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> 2-5 candle pause</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Volume dropping on pause</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Price respecting 10 EMA</li>
-                        </ul>
-                    </div>
+  // EQUITY
+  function renderEquity(){
+    if(eqC.length<2)return h("div",{style:{textAlign:"center",padding:40,color:K.dim}},"Log 2+ trades to see charts.");
+    var charts=[
+      h("div",{key:"cum",style:{background:K.card,borderRadius:8,border:"1px solid "+K.border,padding:14,marginBottom:12}},
+        h("div",{style:{fontSize:11,color:K.dim,marginBottom:6}},"CUMULATIVE P/L"),
+        h(RC.ResponsiveContainer,{width:"100%",height:240},
+          h(RC.AreaChart,{data:eqC},
+            h(RC.CartesianGrid,{strokeDasharray:"3 3",stroke:K.border}),
+            h(RC.XAxis,{dataKey:"idx",tick:{fill:K.dim,fontSize:9},stroke:K.border}),
+            h(RC.YAxis,{tick:{fill:K.dim,fontSize:9},stroke:K.border,tickFormatter:function(v){return"$"+v}}),
+            h(RC.Tooltip,{contentStyle:{background:K.card,border:"1px solid "+K.border,borderRadius:6,fontSize:10},formatter:function(v){return["$"+Number(v).toFixed(2)]},labelFormatter:function(l){return"Trade #"+l}}),
+            h(RC.ReferenceLine,{y:0,stroke:K.dim,strokeDasharray:"3 3"}),
+            h(RC.Area,{type:"monotone",dataKey:"cumPL",stroke:K.cyan,fill:"rgba(30,144,255,.15)",strokeWidth:2})))),
+      h("div",{key:"per",style:{background:K.card,borderRadius:8,border:"1px solid "+K.border,padding:14,marginBottom:12}},
+        h("div",{style:{fontSize:11,color:K.dim,marginBottom:6}},"PER-TRADE P/L"),
+        h(RC.ResponsiveContainer,{width:"100%",height:170},
+          h(RC.BarChart,{data:eqC},
+            h(RC.CartesianGrid,{strokeDasharray:"3 3",stroke:K.border}),
+            h(RC.XAxis,{dataKey:"idx",tick:{fill:K.dim,fontSize:9},stroke:K.border}),
+            h(RC.YAxis,{tick:{fill:K.dim,fontSize:9},stroke:K.border,tickFormatter:function(v){return"$"+v}}),
+            h(RC.Tooltip,{contentStyle:{background:K.card,border:"1px solid "+K.border,borderRadius:6,fontSize:10},formatter:function(v){return["$"+Number(v).toFixed(2),"P/L"]}}),
+            h(RC.ReferenceLine,{y:0,stroke:K.dim,strokeDasharray:"3 3"}),
+            h(RC.Bar,{dataKey:"pl",radius:[3,3,0,0]},eqC.map(function(e,i){return h(RC.Cell,{key:i,fill:e.pl>=0?K.green:K.red})})))))];
+    if(mfeD.length>=2){charts.push(
+      h("div",{key:"mfe",style:{background:K.card,borderRadius:8,border:"1px solid "+K.border,padding:14}},
+        h("div",{style:{fontSize:11,color:K.dim,marginBottom:3}},"MOVE CAPTURE %"),
+        h("div",{style:{fontSize:9,color:K.dim,marginBottom:8}},"How much of the max move you captured. Green=70%+, Gold=50-70%, Red=under 50%."),
+        h(RC.ResponsiveContainer,{width:"100%",height:180},
+          h(RC.BarChart,{data:mfeD},
+            h(RC.CartesianGrid,{strokeDasharray:"3 3",stroke:K.border}),
+            h(RC.XAxis,{dataKey:"ticker",tick:{fill:K.dim,fontSize:9},stroke:K.border}),
+            h(RC.YAxis,{tick:{fill:K.dim,fontSize:9},stroke:K.border,tickFormatter:function(v){return v+"%"},domain:[0,120]}),
+            h(RC.Tooltip,{contentStyle:{background:K.card,border:"1px solid "+K.border,borderRadius:6,fontSize:10},formatter:function(v){return[Number(v).toFixed(1)+"%","Captured"]}}),
+            h(RC.ReferenceLine,{y:70,stroke:K.green,strokeDasharray:"3 3"}),
+            h(RC.ReferenceLine,{y:50,stroke:K.gold,strokeDasharray:"3 3"}),
+            h(RC.Bar,{dataKey:"capture",radius:[3,3,0,0]},mfeD.map(function(e,i){return h(RC.Cell,{key:i,fill:e.capture>=70?K.green:e.capture>=50?K.gold:K.red})}))))));}
+    return h("div",null,charts);
+  }
 
-                    <div class="subsection">
-                        <div class="subsection-title">Calculation</div>
-                        <ul class="checklist">
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Stop % is 0.55-0.70% (Score 5) OR 0.40-0.90% (Score 4)</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Share count is 200+</li>
-                        </ul>
-                    </div>
+  // EXPORT/IMPORT
+  function expJSON(){var b=new Blob([JSON.stringify(trades,null,2)],{type:"application/json"});
+    var u=URL.createObjectURL(b);var a=document.createElement("a");a.href=u;
+    a.download="trade_journal_"+new Date().toISOString().slice(0,10)+".json";a.click();URL.revokeObjectURL(u);}
+  function impJSON(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();
+    r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(Array.isArray(d))setTrades(d);}catch(err){alert("Invalid JSON")}};r.readAsText(f);}
 
-                    <div class="subsection">
-                        <div class="subsection-title">Gut Check</div>
-                        <ul class="checklist">
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Feel confident about this trade</li>
-                            <li><input type="checkbox" onchange="updateCheckbox(this)"> Would take this in backtest</li>
-                        </ul>
-                    </div>
+  // MAIN RENDER
+  return h("div",{style:{background:K.bg,minHeight:"100vh",color:K.text,fontFamily:"'IBM Plex Sans',-apple-system,sans-serif"}},
+    h(LB,{src:lbSrc,onClose:function(){setLbSrc(null)}}),
+    showForm?renderForm():null,
+    h("div",{style:{padding:"10px 14px",borderBottom:"1px solid "+K.border,display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}},
+      h("h1",{style:{margin:0,fontSize:15,fontFamily:"JetBrains Mono,monospace",color:K.gold}},"TRADE JOURNAL"),
+      h("div",{style:{display:"flex",gap:2,background:K.card,borderRadius:8,padding:2}},
+        [["log","Trade Log"],["rules","Rule Analysis"],["equity","Equity / MFE"]].map(function(x){
+          return h("button",{key:x[0],onClick:function(){setView(x[0])},style:{padding:"5px 11px",borderRadius:6,border:"none",fontSize:10,fontWeight:600,cursor:"pointer",background:view===x[0]?K.cyan:"transparent",color:view===x[0]?"#fff":K.dim}},x[1])})),
+      h("div",{style:{flex:1}}),
+      h("button",{onClick:oQuick,style:{padding:"6px 12px",background:K.purple,border:"none",borderRadius:8,color:"#fff",fontSize:10,fontWeight:600,cursor:"pointer"}},"Quick Entry"),
+      h("button",{onClick:oNew,style:{padding:"6px 12px",background:K.green,border:"none",borderRadius:8,color:"#000",fontSize:10,fontWeight:600,cursor:"pointer"}},"+ New Trade"),
+      h("div",{style:{display:"flex",gap:3}},
+        h("button",{onClick:expJSON,style:{padding:"4px 8px",background:"transparent",border:"1px solid "+K.border,borderRadius:6,color:K.dim,fontSize:9,cursor:"pointer"}},"Export"),
+        h("button",{onClick:function(){iRef.current&&iRef.current.click()},style:{padding:"4px 8px",background:"transparent",border:"1px solid "+K.border,borderRadius:6,color:K.dim,fontSize:9,cursor:"pointer"}},"Import"),
+        h("input",{ref:iRef,type:"file",accept:".json",onChange:impJSON,style:{display:"none"}}))),
+    h("div",{style:{padding:14,maxWidth:1200,margin:"0 auto"}},
+      view==="log"?renderLog():null,
+      view==="rules"?renderRules():null,
+      view==="equity"?renderEquity():null));
+}
 
-                    <button class="reset-btn" onclick="resetAllCheckboxes()">Reset All Checkboxes</button>
-                </div>
-            </div>
-
-            <!-- Section 7: Daily Limits -->
-            <div class="section">
-                <div class="section-header">
-                    <span class="number">7</span>
-                    DAILY LIMITS & STOPPING RULES
-                </div>
-                <div class="section-content">
-                    <div class="danger-box">
-                        <strong>🛑 HARD STOPS (Walk Away Immediately):</strong>
-                        <ul style="margin-top: 10px;">
-                            <li>3 consecutive losses (LLL)</li>
-                            <li>+$3,000 daily profit reached</li>
-                            <li>-$2,500 daily loss reached</li>
-                            <li>4 trades taken today</li>
-                        </ul>
-                    </div>
-
-                    <div class="highlight-box">
-                        <strong>⚠️ Soft Stops (Consider Stopping):</strong>
-                        <ul style="margin-top: 10px;">
-                            <li>After WW (two wins) - captured $2,257 avg day</li>
-                            <li>Feeling "off" or uncertain</li>
-                            <li>After 3 trades in danger zone (11:30-1:30)</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p><strong>Your Edge is REAL: 62% baseline, 82.4% in sweet spot</strong></p>
-            <p>Now EXECUTE it systematically.</p>
-        </div>
-    </div>
-
-    <script>
-        function calculatePosition() {
-            const entry = parseFloat(document.getElementById('entryPrice').value);
-            const stop = parseFloat(document.getElementById('stopLevel').value);
-
-            if (!entry || !stop) {
-                alert('Please enter both Entry Price and Stop Level');
-                return;
-            }
-
-            // Calculate stop distance
-            const stopDistance = Math.abs(entry - stop);
-            const stopPercent = (stopDistance / entry) * 100;
-            
-            // Calculate target (1.2R)
-            const targetDistance = stopDistance * 1.2;
-            const targetPrice = entry > stop ? entry + targetDistance : entry - targetDistance;
-            
-            // Calculate shares
-            const shares = Math.floor(1000 / stopDistance);
-
-            // Determine quality
-            let quality = '';
-            let qualityClass = '';
-            let expectedWR = '';
-
-            if (stopPercent >= 0.55 && stopPercent <= 0.70) {
-                quality = 'Score 5 (SWEET SPOT)';
-                qualityClass = 'quality-score-5';
-                expectedWR = '82.4%';
-            } else if (stopPercent >= 0.40 && stopPercent <= 0.90) {
-                quality = 'Score 4 (Good)';
-                qualityClass = 'quality-score-4';
-                expectedWR = '72-82%';
-            } else if (stopPercent < 0.25) {
-                quality = 'SKIP (Too Tight)';
-                qualityClass = 'quality-skip';
-                expectedWR = '63%';
-            } else if (stopPercent > 0.90) {
-                quality = 'SKIP (Too Wide)';
-                qualityClass = 'quality-skip';
-                expectedWR = '<72%';
-            } else {
-                quality = 'Marginal';
-                qualityClass = 'quality-score-4';
-                expectedWR = '60-70%';
-            }
-
-            // Display results
-            document.getElementById('stopDistance').textContent = '$' + stopDistance.toFixed(2);
-            document.getElementById('stopPercent').textContent = stopPercent.toFixed(2) + '%';
-            document.getElementById('targetPrice').textContent = '$' + targetPrice.toFixed(2);
-            document.getElementById('shareCount').textContent = shares + ' shares';
-            
-            const qualityElement = document.getElementById('setupQuality');
-            qualityElement.innerHTML = `<span class="quality-indicator ${qualityClass}">${quality}</span>`;
-            
-            document.getElementById('expectedWR').textContent = expectedWR;
-            document.getElementById('calcResults').style.display = 'block';
-        }
-
-        function resetCalculator() {
-            document.getElementById('entryPrice').value = '';
-            document.getElementById('stopLevel').value = '';
-            document.getElementById('calcResults').style.display = 'none';
-        }
-
-        function updateCheckbox(checkbox) {
-            if (checkbox.checked) {
-                checkbox.parentElement.classList.add('checked');
-            } else {
-                checkbox.parentElement.classList.remove('checked');
-            }
-        }
-
-        function resetAllCheckboxes() {
-            const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                cb.checked = false;
-                cb.parentElement.classList.remove('checked');
-            });
-        }
-    </script>
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+})();
+</script>
 </body>
 </html>
